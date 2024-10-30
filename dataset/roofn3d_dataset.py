@@ -64,6 +64,7 @@ class RoofN3dDataset(Dataset):
     def __getitem__(self, item):
         file_path = self.file_list[item]
         frame_id = file_path.split('/')[-1]
+        print(f"file_path | {file_path}")
         points = read_pts(file_path + '/points.xyz')
         points = self.transform(points)
 
