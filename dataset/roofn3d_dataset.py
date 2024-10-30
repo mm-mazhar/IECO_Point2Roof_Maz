@@ -48,6 +48,7 @@ class RoofN3dDataset(Dataset):
         self.file_list = [f.strip() for f in self.file_list]
         flist = []
         for l in self.file_list:
+            #  flist.append(data_path + l)
              flist.append(l)
         self.file_list = flist
 
