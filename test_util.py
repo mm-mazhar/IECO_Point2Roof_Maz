@@ -46,7 +46,7 @@ def test_model(model, data_loader, logger):
     dataloader_iter = iter(data_loader)
     with tqdm.trange(0, len(data_loader), desc='test', dynamic_ncols=True) as tbar:
         model.use_edge = True
-        statistics = {'tp_pts': 0, 'num_label_pts': 0, 'num_pred_pts': 0, 'pts_bias': np.zeros(3, np.float),
+        statistics = {'tp_pts': 0, 'num_label_pts': 0, 'num_pred_pts': 0, 'pts_bias': np.zeros(3, np.float64),
                       'tp_edges': 0, 'num_label_edges': 0, 'num_pred_edges': 0}
         for cur_it in tbar:
             batch = next(dataloader_iter)
