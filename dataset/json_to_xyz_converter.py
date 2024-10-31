@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # """
-# dataset_preprocessor.py
-# Created on Oct Sept 02, 2024
+# json_to_xyz_converter.py
+# Created on Oct Sept 30, 2024
 # """
 
 import os
