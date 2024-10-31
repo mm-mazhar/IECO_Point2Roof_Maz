@@ -91,7 +91,7 @@ def main():
 
     # Load model
     net = RoofNet(cfg.MODEL)
-    net.use_edge = True  # Enable edge processing for inference
+    net.use_edge = False  # Enable edge processing for inference
     net.cuda()
     net.eval()
 
@@ -114,10 +114,12 @@ def main():
         batch_dict = {key: value.cuda() for key, value in batch_dict.items()}
 
         # Run the model
-        output = net(batch_dict)
-
-        # Move output to CPU for post-processing
-        output = {key: value.cpu() for key, value in output.items()}
+        try:
+            output = net(batch_dict)
+            output = {key: value.cpu() for key, value in output.items()}
+            save_as_obj(output, obj_path)
+        except Exception as e:
+            logger.error(f"Error during inference or saving: {e}")
 
         # Log output structure for debugging
         logger.info("Model Output Structure:")
