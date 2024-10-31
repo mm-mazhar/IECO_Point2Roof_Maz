@@ -9,10 +9,12 @@ import datetime
 import os
 
 import torch
+import numpy as np
+import open3d as o3d
 
+from model import model_utils
 from model.roofnet import RoofNet
 from utils import common_utils
-from model import model_utils
 
 
 def parse_config():
@@ -51,6 +53,19 @@ def parse_config():
     return args, cfg
 
 
+def compute_normals(points):
+    # Convert the points to an Open3D point cloud
+    point_cloud = o3d.geometry.PointCloud()
+    point_cloud.points = o3d.utility.Vector3dVector(points)
+
+    # Estimate normals
+    point_cloud.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
+
+    # Convert normals back to a numpy array
+    normals = np.asarray(point_cloud.normals)
+    return normals
+
+
 def main():
     args, cfg = parse_config()
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
@@ -71,6 +86,9 @@ def main():
     # Load point cloud file
     points = load_point_cloud(args.file_path)
 
+    # Compute normals
+    normals = compute_normals(points.squeeze(0).numpy())  # Remove batch dimension for normal computation
+
     # Load model
     net = RoofNet(cfg.MODEL)
     net.use_edge = True  # Enable edge processing for inference
@@ -88,15 +106,16 @@ def main():
     with torch.no_grad():
         # Prepare batch_dict for RoofNet
         batch_dict = {
-            "points": points
-        }  # Include other keys if required by PointNet2 or submodules
-
+            "points": points,
+            "vectors": torch.tensor(normals, dtype=torch.float32).unsqueeze(0).cuda()  # Add batch dimension and move to GPU
+        }
+        
         # Move the entire batch_dict to GPU
         batch_dict = {key: value.cuda() for key, value in batch_dict.items()}
-        
+
         # Run the model
         output = net(batch_dict)
-        
+
         # Move output to CPU for post-processing
         output = {key: value.cpu() for key, value in output.items()}
 
