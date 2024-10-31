@@ -2,7 +2,7 @@ from .pointnet2 import PointNet2
 from .cluster_refine import ClusterRefineNet
 from .edge_pred_net import EdgeAttentionNet
 import torch.nn as nn
-from sklearn.cluster import DBSCAN
+# from sklearn.cluster import DBSCAN
 
 
 class RoofNet(nn.Module):
